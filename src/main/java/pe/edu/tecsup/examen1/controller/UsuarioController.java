@@ -1,9 +1,38 @@
 package pe.edu.tecsup.examen1.controller;
 
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
 
-@Controller
-@RequestMapping("/usuarios")
 public class UsuarioController {
+
+    private final UsuarioService usuarioService;
+
+    public UsuarioController(UsuarioService usuarioService) {
+        this.usuarioService = usuarioService;
+    }
+
+    @PostMapping
+    public Usuario registrarUsuario(@RequestBody Usuario usuario) {
+        return usuarioService.registrarUsuario(usuario);
+    }
+
+    @GetMapping
+    public java.util.List<Usuario> listarUsuarios() {
+        return usuarioService.listarUsuarios();
+    }
+
+    @PutMapping("/{id}")
+    public Usuario modificarUsuario(
+            @PathVariable Long id,
+            @RequestBody Usuario usuario) {
+
+        return usuarioService.modificarUsuario(id, usuario);
+    }
+
+    @PatchMapping("/{id}/estado")
+    public Usuario cambiarEstado(
+            @PathVariable Long id,
+            @RequestParam boolean activo) {
+
+        return usuarioService.cambiarEstado(id, activo);
+    }
+
 }
