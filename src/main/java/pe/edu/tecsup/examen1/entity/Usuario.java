@@ -39,12 +39,12 @@ public class Usuario {
     @Column(nullable = false)
     private boolean activo = true;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private LocalDateTime fechaRegistro;
 
     private LocalDateTime ultimoAcceso;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "usuario_rol",
             joinColumns = @JoinColumn(name = "usuario_id"),
@@ -54,7 +54,9 @@ public class Usuario {
 
     @PrePersist
     protected void alCrear() {
-        fechaRegistro = LocalDateTime.now();
+        if (fechaRegistro == null) {
+            fechaRegistro = LocalDateTime.now();
+        }
         activo = true;
     }
 

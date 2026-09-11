@@ -5,9 +5,10 @@ import pe.edu.tecsup.examen1.entity.Usuario;
 import pe.edu.tecsup.examen1.service.UsuarioService;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
-@RequestMapping("/usuarios")
+@RequestMapping("/api/usuarios")
 public class UsuarioController {
 
     private final UsuarioService usuarioService;
@@ -40,5 +41,12 @@ public class UsuarioController {
             @RequestParam boolean activo) {
 
         return usuarioService.cambiarEstado(id, activo);
+    }
+    @PutMapping("/{id}/roles")
+    public Usuario asignarRoles(
+            @PathVariable Long id,
+            @RequestBody Set<Long> rolesIds) {
+
+        return usuarioService.asignarRoles(id, rolesIds);
     }
 }

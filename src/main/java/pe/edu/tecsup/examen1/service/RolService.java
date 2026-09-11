@@ -12,4 +12,6 @@ public interface RolService {
     Rol guardarRol(Rol rol);
     Rol asignarPermisos(Long rolId, Set<Long> permisosIds);
     List<Permiso> listarPermisos();
+
+
 }

@@ -4,33 +4,56 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import pe.edu.tecsup.examen1.entity.TokenRecuperacion;
 import pe.edu.tecsup.examen1.entity.Usuario;
+import pe.edu.tecsup.examen1.repository.RolRepository;
 import pe.edu.tecsup.examen1.repository.TokenRecuperacionRepository;
 import pe.edu.tecsup.examen1.repository.UsuarioRepository;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+
+import pe.edu.tecsup.examen1.entity.Rol;
+import java.util.HashSet;
+import java.util.Set;
 @Service
 public class UsuarioService {
+
+    private static final String MSG_USUARIO_NO_ENCONTRADO = "Usuario no encontrado con ID: ";
+    private final RolRepository rolRepository;
 
     private final UsuarioRepository usuarioRepository;
     private final TokenRecuperacionRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;
+    private final Clock clock;
 
-    public UsuarioService(UsuarioRepository usuarioRepository,
+    public UsuarioService(RolRepository rolRepository, UsuarioRepository usuarioRepository,
                           TokenRecuperacionRepository tokenRepository,
-                          PasswordEncoder passwordEncoder) {
+                          PasswordEncoder passwordEncoder,
+                          Clock clock) {
+        this.rolRepository = rolRepository;
         this.usuarioRepository = usuarioRepository;
         this.tokenRepository = tokenRepository;
         this.passwordEncoder = passwordEncoder;
+        this.clock = clock;
     }
+    public Usuario asignarRoles(Long usuarioId, Set<Long> rolesIds) {
+        Usuario usuario = usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new RuntimeException(MSG_USUARIO_NO_ENCONTRADO + usuarioId));
 
-    // --- Métodos para el CRUD de Usuarios ---
+        List<Rol> roles = rolRepository.findAllById(rolesIds);
 
+        if (roles.size() != rolesIds.size()) {
+            throw new RuntimeException("Uno o más roles no existen");
+        }
+
+        usuario.setRoles(new HashSet<>(roles));
+
+        return usuarioRepository.save(usuario);
+    }
     public Usuario registrarUsuario(Usuario usuario) {
-        // Encriptar la contraseña antes de guardar
         usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
         usuario.setActivo(true);
         return usuarioRepository.save(usuario);
@@ -38,6 +61,22 @@ public class UsuarioService {
 
     public List<Usuario> listarUsuarios() {
         return usuarioRepository.findAll();
+    }
+    public List<Usuario> buscarUsuarios(String termino) {
+        if (termino == null || termino.isBlank()) {
+            return usuarioRepository.findAll();
+        }
+
+        String texto = termino.trim();
+
+        return usuarioRepository
+                .findByNombresContainingIgnoreCaseOrApellidosContainingIgnoreCaseOrDniContainingOrCorreoContainingIgnoreCaseOrUsuarioContainingIgnoreCase(
+                        texto, texto, texto, texto, texto);
+    }
+
+    public Usuario buscarPorId(Long id) {
+        return usuarioRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException(MSG_USUARIO_NO_ENCONTRADO + id));
     }
 
     public Usuario modificarUsuario(Long id, Usuario datosNuevos) {
@@ -53,17 +92,15 @@ public class UsuarioService {
                 usuario.setPassword(passwordEncoder.encode(datosNuevos.getPassword()));
             }
             return usuarioRepository.save(usuario);
-        }).orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + id));
+        }).orElseThrow(() -> new RuntimeException(MSG_USUARIO_NO_ENCONTRADO + id));
     }
 
     public Usuario cambiarEstado(Long id, boolean activo) {
         return usuarioRepository.findById(id).map(usuario -> {
             usuario.setActivo(activo);
             return usuarioRepository.save(usuario);
-        }).orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + id));
+        }).orElseThrow(() -> new RuntimeException(MSG_USUARIO_NO_ENCONTRADO + id));
     }
-
-    // --- Métodos de Autenticación y Recuperación ---
 
     public Optional<Usuario> buscarPorUsuarioOCorreo(String termino) {
         return usuarioRepository.findByUsuarioOrCorreo(termino, termino);
@@ -74,7 +111,7 @@ public class UsuarioService {
         TokenRecuperacion tokenEntity = new TokenRecuperacion(
                 token,
                 usuario,
-                LocalDateTime.now().plusMinutes(15)
+                LocalDateTime.now(clock).plusMinutes(15)
         );
         tokenRepository.save(tokenEntity);
         return token;
@@ -82,12 +119,12 @@ public class UsuarioService {
 
     public boolean validarToken(String token) {
         Optional<TokenRecuperacion> tokenOpt = tokenRepository.findByToken(token);
-        return tokenOpt.isPresent() && tokenOpt.get().getFechaExpiracion().isAfter(LocalDateTime.now());
+        return tokenOpt.isPresent() && tokenOpt.get().getFechaExpiracion().isAfter(LocalDateTime.now(clock));
     }
 
     public boolean cambiarPasswordConToken(String token, String nuevaPassword) {
         Optional<TokenRecuperacion> tokenOpt = tokenRepository.findByToken(token);
-        if (tokenOpt.isPresent() && tokenOpt.get().getFechaExpiracion().isAfter(LocalDateTime.now())) {
+        if (tokenOpt.isPresent() && tokenOpt.get().getFechaExpiracion().isAfter(LocalDateTime.now(clock))) {
             TokenRecuperacion tokenEntity = tokenOpt.get();
             Usuario usuario = tokenEntity.getUsuario();
 

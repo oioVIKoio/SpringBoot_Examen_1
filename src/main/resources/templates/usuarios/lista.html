@@ -17,7 +17,27 @@
             Nuevo Usuario
         </a>
     </div>
+    <form th:action="@{/usuarios}" method="get" class="mb-4">
 
+        <div class="input-group">
+
+            <input type="text"
+                   name="termino"
+                   class="form-control"
+                   placeholder="Buscar por nombre, DNI, correo o usuario..."
+                   th:value="${termino}">
+
+            <button type="submit" class="btn btn-primary">
+                Buscar
+            </button>
+
+            <a th:href="@{/usuarios}" class="btn btn-secondary">
+                Limpiar
+            </a>
+
+        </div>
+
+    </form>
     <table class="table table-bordered table-hover bg-white">
         <thead class="table-dark">
         <tr>
@@ -49,7 +69,10 @@
                    class="btn btn-warning btn-sm">
                     Editar
                 </a>
-
+                <a th:href="@{'/usuarios/roles/' + ${usuario.id}}"
+                   class="btn btn-info btn-sm">
+                    Roles
+                </a>
                 <a th:if="${usuario.activo}"
                    th:href="@{'/usuarios/desactivar/' + ${usuario.id}}"
                    class="btn btn-danger btn-sm">
