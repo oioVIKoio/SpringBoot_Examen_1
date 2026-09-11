@@ -58,8 +58,6 @@ public class Usuario {
         activo = true;
     }
 
-    // Getters y Setters
-
     public Long getId() {
         return id;
     }

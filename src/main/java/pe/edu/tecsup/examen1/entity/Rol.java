@@ -29,8 +29,6 @@ public class Rol {
     )
     private Set<Permiso> permisos = new HashSet<>();
 
-    // Getters y Setters
-
     public Long getId() {
         return id;
     }

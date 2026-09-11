@@ -33,8 +33,6 @@ public class Auditoria {
         fecha = LocalDateTime.now();
     }
 
-    // Getters y Setters
-
     public Long getId() {
         return id;
     }

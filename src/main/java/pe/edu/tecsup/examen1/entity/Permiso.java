@@ -21,8 +21,6 @@ public class Permiso {
     @ManyToMany(mappedBy = "permisos")
     private Set<Rol> roles = new HashSet<>();
 
-    // Getters y Setters
-
     public Long getId() {
         return id;
     }
