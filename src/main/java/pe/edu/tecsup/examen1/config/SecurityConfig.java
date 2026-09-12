@@ -39,9 +39,10 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
 
                 .authorizeHttpRequests(auth -> auth
-
                         .requestMatchers(
                                 "/login",
+                                "/recuperar-password",
+                                "/restablecer-password",
                                 "/css/**",
                                 "/js/**",
                                 "/images/**"

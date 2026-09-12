@@ -20,7 +20,6 @@ public class DataInitializer {
 
         return args -> {
 
-            // Crear rol ADMIN si no existe
             Rol rolAdmin = rolRepository.findByNombre("ADMIN")
                     .orElseGet(() -> {
                         Rol rol = new Rol();
@@ -29,11 +28,12 @@ public class DataInitializer {
                         return rolRepository.save(rol);
                     });
 
-            // Crear usuario admin si no existe
             Usuario admin = usuarioRepository
                     .findByUsuarioOrCorreo("admin", "admin@tecsup.edu.pe")
                     .orElseGet(() -> {
+
                         Usuario usuario = new Usuario();
+
                         usuario.setNombres("Administrador");
                         usuario.setApellidos("Sistema");
                         usuario.setDni("00000001");
@@ -41,20 +41,23 @@ public class DataInitializer {
                         usuario.setTelefono("");
                         usuario.setUsuario("admin");
                         usuario.setArea("Administración");
+
+                        usuario.setPassword(
+                                passwordEncoder.encode("admin")
+                        );
+
+                        usuario.setActivo(true);
+
                         return usuario;
                     });
 
-            // Datos de acceso conocidos para pruebas
-            admin.setPassword(passwordEncoder.encode("admin"));
-            admin.setActivo(true);
             admin.getRoles().add(rolAdmin);
 
             usuarioRepository.save(admin);
 
             System.out.println("==========================================");
-            System.out.println(" ADMIN INICIALIZADO");
+            System.out.println(" ADMIN DISPONIBLE");
             System.out.println(" Usuario: admin");
-            System.out.println(" Password: admin");
             System.out.println(" Rol: ADMIN");
             System.out.println("==========================================");
         };
