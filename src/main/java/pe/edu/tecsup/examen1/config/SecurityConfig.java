@@ -172,7 +172,8 @@ public class SecurityConfig {
                                 "/api/roles/**"
                         )
                         .hasAuthority("ROLES_VER")
-
+                        .requestMatchers("/auditorias/**")
+                        .hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
 

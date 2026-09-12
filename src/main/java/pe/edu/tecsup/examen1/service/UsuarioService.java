@@ -28,20 +28,28 @@ public class UsuarioService {
     private final TokenRecuperacionRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final Clock clock;
+    private final AuditoriaService auditoriaService;
 
     public UsuarioService(RolRepository rolRepository, UsuarioRepository usuarioRepository,
                           TokenRecuperacionRepository tokenRepository,
                           PasswordEncoder passwordEncoder,
-                          Clock clock) {
+                          Clock clock,
+                          AuditoriaService auditoriaService) {
         this.rolRepository = rolRepository;
         this.usuarioRepository = usuarioRepository;
         this.tokenRepository = tokenRepository;
         this.passwordEncoder = passwordEncoder;
         this.clock = clock;
+        this.auditoriaService = auditoriaService;
     }
     public Usuario asignarRoles(Long usuarioId, Set<Long> rolesIds) {
+
         Usuario usuario = usuarioRepository.findById(usuarioId)
-                .orElseThrow(() -> new RuntimeException(MSG_USUARIO_NO_ENCONTRADO + usuarioId));
+                .orElseThrow(() ->
+                        new RuntimeException(
+                                MSG_USUARIO_NO_ENCONTRADO + usuarioId
+                        )
+                );
 
         List<Rol> roles = rolRepository.findAllById(rolesIds);
 
@@ -51,12 +59,34 @@ public class UsuarioService {
 
         usuario.setRoles(new HashSet<>(roles));
 
-        return usuarioRepository.save(usuario);
+        Usuario actualizado = usuarioRepository.save(usuario);
+
+        auditoriaService.registrar(
+                "ASIGNAR_ROLES",
+                "USUARIOS",
+                "Se modificaron los roles del usuario "
+                        + actualizado.getUsuario()
+        );
+
+        return actualizado;
     }
     public Usuario registrarUsuario(Usuario usuario) {
-        usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
+        usuario.setPassword(
+                passwordEncoder.encode(usuario.getPassword())
+        );
         usuario.setActivo(true);
-        return usuarioRepository.save(usuario);
+
+        Usuario registrado =
+                usuarioRepository.save(usuario);
+
+        auditoriaService.registrar(
+                "CREAR_USUARIO",
+                "USUARIOS",
+                "Se registró el usuario "
+                        + registrado.getUsuario()
+        );
+
+        return registrado;
     }
 
     public List<Usuario> listarUsuarios() {
@@ -79,27 +109,74 @@ public class UsuarioService {
                 .orElseThrow(() -> new RuntimeException(MSG_USUARIO_NO_ENCONTRADO + id));
     }
 
-    public Usuario modificarUsuario(Long id, Usuario datosNuevos) {
-        return usuarioRepository.findById(id).map(usuario -> {
-            usuario.setNombres(datosNuevos.getNombres());
-            usuario.setApellidos(datosNuevos.getApellidos());
-            usuario.setDni(datosNuevos.getDni());
-            usuario.setCorreo(datosNuevos.getCorreo());
-            usuario.setTelefono(datosNuevos.getTelefono());
-            usuario.setUsuario(datosNuevos.getUsuario());
-            usuario.setArea(datosNuevos.getArea());
-            if (datosNuevos.getPassword() != null && !datosNuevos.getPassword().isBlank()) {
-                usuario.setPassword(passwordEncoder.encode(datosNuevos.getPassword()));
-            }
-            return usuarioRepository.save(usuario);
-        }).orElseThrow(() -> new RuntimeException(MSG_USUARIO_NO_ENCONTRADO + id));
+    public Usuario modificarUsuario(
+            Long id,
+            Usuario datosNuevos) {
+
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException(
+                                MSG_USUARIO_NO_ENCONTRADO + id
+                        )
+                );
+
+        usuario.setNombres(datosNuevos.getNombres());
+        usuario.setApellidos(datosNuevos.getApellidos());
+        usuario.setDni(datosNuevos.getDni());
+        usuario.setCorreo(datosNuevos.getCorreo());
+        usuario.setTelefono(datosNuevos.getTelefono());
+        usuario.setUsuario(datosNuevos.getUsuario());
+        usuario.setArea(datosNuevos.getArea());
+
+        if (datosNuevos.getPassword() != null
+                && !datosNuevos.getPassword().isBlank()) {
+
+            usuario.setPassword(
+                    passwordEncoder.encode(
+                            datosNuevos.getPassword()
+                    )
+            );
+        }
+
+        Usuario actualizado =
+                usuarioRepository.save(usuario);
+
+        auditoriaService.registrar(
+                "MODIFICAR_USUARIO",
+                "USUARIOS",
+                "Se modificó el usuario "
+                        + actualizado.getUsuario()
+        );
+
+        return actualizado;
     }
 
-    public Usuario cambiarEstado(Long id, boolean activo) {
-        return usuarioRepository.findById(id).map(usuario -> {
-            usuario.setActivo(activo);
-            return usuarioRepository.save(usuario);
-        }).orElseThrow(() -> new RuntimeException(MSG_USUARIO_NO_ENCONTRADO + id));
+    public Usuario cambiarEstado(
+            Long id,
+            boolean activo) {
+
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException(
+                                MSG_USUARIO_NO_ENCONTRADO + id
+                        )
+                );
+
+        usuario.setActivo(activo);
+
+        Usuario actualizado =
+                usuarioRepository.save(usuario);
+
+        auditoriaService.registrar(
+                "CAMBIAR_ESTADO_USUARIO",
+                "USUARIOS",
+                "Usuario "
+                        + actualizado.getUsuario()
+                        + " cambiado a estado "
+                        + (activo ? "ACTIVO" : "INACTIVO")
+        );
+
+        return actualizado;
     }
 
     public Optional<Usuario> buscarPorUsuarioOCorreo(String termino) {
