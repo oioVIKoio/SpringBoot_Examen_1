@@ -84,24 +84,41 @@ public class RecuperacionPasswordController {
             @RequestParam String password,
             Model model) {
 
-        boolean cambiado =
-                usuarioService.cambiarPasswordConToken(
-                        token,
-                        password
+        try {
+
+            boolean cambiado =
+                    usuarioService.cambiarPasswordConToken(
+                            token,
+                            password
+                    );
+
+            if (!cambiado) {
+
+                model.addAttribute(
+                        "error",
+                        "El enlace de recuperación es inválido o ha expirado."
                 );
 
-        if (!cambiado) {
+                model.addAttribute("token", token);
+
+                return "restablecer-password";
+            }
+
+            return "redirect:/login?cambioExitoso";
+
+        } catch (IllegalArgumentException e) {
 
             model.addAttribute(
                     "error",
-                    "El enlace de recuperación es inválido o ha expirado."
+                    e.getMessage()
             );
 
-            model.addAttribute("token", token);
+            model.addAttribute(
+                    "token",
+                    token
+            );
 
             return "restablecer-password";
         }
-
-        return "redirect:/login?cambioExitoso";
     }
 }

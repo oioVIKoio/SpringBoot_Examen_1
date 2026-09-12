@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <title>Permisos</title>
@@ -12,8 +14,10 @@
 
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2>Permisos</h2>
-        <a th:href="@{/permisos/nuevo}" class="btn btn-primary">
-            Nuevo permiso
+        <a th:href="@{/permisos/nuevo}"
+           class="btn btn-primary"
+           sec:authorize="hasAuthority('PERMISOS_CREAR')">
+            Nuevo Permiso
         </a>
     </div>
 
@@ -33,8 +37,9 @@
             <td th:text="${permiso.nombre}"></td>
             <td th:text="${permiso.descripcion}"></td>
             <td>
-                <a th:href="@{/permisos/editar/{id}(id=${permiso.id})}"
-                   class="btn btn-sm btn-warning">
+                <a th:href="@{'/permisos/editar/' + ${permiso.id}}"
+                   class="btn btn-warning btn-sm"
+                   sec:authorize="hasAuthority('PERMISOS_EDITAR')">
                     Editar
                 </a>
             </td>

@@ -94,12 +94,19 @@
                                th:text="${usuarioForm.id == null ? 'Contraseña' : 'Contraseña (dejar vacío para conservarla)'}">
                             Contraseña
                         </label>
+
                         <input type="password"
                                id="password"
                                class="form-control"
                                th:field="*{password}"
                                th:required="${usuarioForm.id == null}">
+
+                        <div th:if="${errorPassword}"
+                             class="alert alert-danger mt-2 mb-0"
+                             th:text="${errorPassword}">
+                        </div>
                     </div>
+
 
                     <div class="col-md-6 mb-3">
                         <label for="area" class="form-label">Área</label>

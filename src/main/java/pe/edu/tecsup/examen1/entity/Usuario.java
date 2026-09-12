@@ -52,6 +52,10 @@ public class Usuario {
     )
     private Set<Rol> roles = new HashSet<>();
 
+    private Integer intentosFallidos = 0;
+
+    private LocalDateTime bloqueadoHasta;
+
     @PrePersist
     protected void alCrear() {
         if (fechaRegistro == null) {
@@ -163,4 +167,21 @@ public class Usuario {
     public void setRoles(Set<Rol> roles) {
         this.roles = roles;
     }
+
+    public Integer getIntentosFallidos() {
+        return intentosFallidos;
+    }
+
+    public void setIntentosFallidos(Integer intentosFallidos) {
+        this.intentosFallidos = intentosFallidos;
+    }
+
+    public LocalDateTime getBloqueadoHasta() {
+        return bloqueadoHasta;
+    }
+
+    public void setBloqueadoHasta(LocalDateTime bloqueadoHasta) {
+        this.bloqueadoHasta = bloqueadoHasta;
+    }
+
 }

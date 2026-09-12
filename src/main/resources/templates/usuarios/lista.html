@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,27 +15,63 @@
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Gestión de Usuarios</h2>
-        <a th:href="@{/usuarios/nuevo}" class="btn btn-primary">
+        <a th:href="@{/usuarios/nuevo}"
+           class="btn btn-primary"
+           sec:authorize="hasAuthority('USUARIOS_CREAR')">
             Nuevo Usuario
         </a>
     </div>
     <form th:action="@{/usuarios}" method="get" class="mb-4">
 
-        <div class="input-group">
+        <div class="row g-2">
 
-            <input type="text"
-                   name="termino"
-                   class="form-control"
-                   placeholder="Buscar por nombre, DNI, correo o usuario..."
-                   th:value="${termino}">
+            <div class="col-md-5">
+                <input type="text"
+                       name="termino"
+                       class="form-control"
+                       placeholder="Buscar por nombre, DNI, correo o usuario..."
+                       th:value="${termino}">
+            </div>
 
-            <button type="submit" class="btn btn-primary">
-                Buscar
-            </button>
+            <div class="col-md-3">
+                <select name="rolId" class="form-select">
+                    <option value="">Todos los roles</option>
 
-            <a th:href="@{/usuarios}" class="btn btn-secondary">
-                Limpiar
-            </a>
+                    <option th:each="rol : ${roles}"
+                            th:value="${rol.id}"
+                            th:text="${rol.nombre}"
+                            th:selected="${rolId != null and rol.id == rolId}">
+                    </option>
+                </select>
+            </div>
+
+            <div class="col-md-2">
+                <select name="activo" class="form-select">
+                    <option value="">Todos los estados</option>
+
+                    <option value="true"
+                            th:selected="${activo != null and activo}">
+                        Activo
+                    </option>
+
+                    <option value="false"
+                            th:selected="${activo != null and !activo}">
+                        Inactivo
+                    </option>
+                </select>
+            </div>
+
+            <div class="col-md-2 d-flex gap-2">
+                <button type="submit"
+                        class="btn btn-primary flex-fill">
+                    Buscar
+                </button>
+
+                <a th:href="@{/usuarios}"
+                   class="btn btn-secondary">
+                    Limpiar
+                </a>
+            </div>
 
         </div>
 
@@ -65,25 +103,33 @@
             </td>
 
             <td>
+
                 <a th:href="@{'/usuarios/editar/' + ${usuario.id}}"
-                   class="btn btn-warning btn-sm">
+                   class="btn btn-warning btn-sm"
+                   sec:authorize="hasAuthority('USUARIOS_EDITAR')">
                     Editar
                 </a>
+
                 <a th:href="@{'/usuarios/roles/' + ${usuario.id}}"
-                   class="btn btn-info btn-sm">
+                   class="btn btn-info btn-sm"
+                   sec:authorize="hasAuthority('USUARIOS_ROLES')">
                     Roles
                 </a>
+
                 <a th:if="${usuario.activo}"
                    th:href="@{'/usuarios/desactivar/' + ${usuario.id}}"
-                   class="btn btn-danger btn-sm">
+                   class="btn btn-danger btn-sm"
+                   sec:authorize="hasAuthority('USUARIOS_ESTADO')">
                     Desactivar
                 </a>
 
                 <a th:unless="${usuario.activo}"
                    th:href="@{'/usuarios/activar/' + ${usuario.id}}"
-                   class="btn btn-success btn-sm">
+                   class="btn btn-success btn-sm"
+                   sec:authorize="hasAuthority('USUARIOS_ESTADO')">
                     Activar
                 </a>
+
             </td>
         </tr>
         </tbody>

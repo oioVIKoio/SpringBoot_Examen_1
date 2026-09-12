@@ -56,10 +56,27 @@ public class UsuarioViewController {
     @GetMapping
     public String listarUsuarios(
             @RequestParam(required = false) String termino,
+            @RequestParam(required = false) Long rolId,
+            @RequestParam(required = false) Boolean activo,
             Model model) {
 
-        model.addAttribute("usuarios", usuarioService.buscarUsuarios(termino));
+        model.addAttribute(
+                "usuarios",
+                usuarioService.buscarUsuarios(
+                        termino,
+                        rolId,
+                        activo
+                )
+        );
+
+        model.addAttribute(
+                "roles",
+                rolService.listarTodos()
+        );
+
         model.addAttribute("termino", termino);
+        model.addAttribute("rolId", rolId);
+        model.addAttribute("activo", activo);
 
         return "usuarios/lista";
     }
@@ -81,15 +98,26 @@ public class UsuarioViewController {
     }
 
     @PostMapping("/guardar")
-    public String guardarUsuario(@ModelAttribute("usuarioForm") Usuario usuario) {
+    public String guardarUsuario(
+            @ModelAttribute("usuarioForm") Usuario usuario,
+            Model model) {
 
-        if (usuario.getId() == null) {
-            usuarioService.registrarUsuario(usuario);
-        } else {
-            usuarioService.modificarUsuario(usuario.getId(), usuario);
+        try {
+
+            if (usuario.getId() == null) {
+                usuarioService.registrarUsuario(usuario);
+            } else {
+                usuarioService.modificarUsuario(usuario.getId(), usuario);
+            }
+
+            return REDIRECT_USUARIOS;
+
+        } catch (IllegalArgumentException e) {
+
+            model.addAttribute("errorPassword", e.getMessage());
+
+            return "usuarios/formulario";
         }
-
-        return REDIRECT_USUARIOS;
     }
     @GetMapping("/desactivar/{id}")
     public String desactivarUsuario(@PathVariable Long id) {

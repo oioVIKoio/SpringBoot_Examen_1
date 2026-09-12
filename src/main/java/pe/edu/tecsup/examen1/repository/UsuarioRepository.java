@@ -9,13 +9,9 @@ import java.util.Optional;
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
     Optional<Usuario> findByUsuarioOrCorreo(String usuario, String correo);
+    List<Usuario> findByActivo(boolean activo);
 
-    List<Usuario> findByNombresContainingIgnoreCaseOrApellidosContainingIgnoreCaseOrDniContainingOrCorreoContainingIgnoreCaseOrUsuarioContainingIgnoreCase(
-            String nombres,
-            String apellidos,
-            String dni,
-            String correo,
-            String usuario
-    );
+    List<Usuario> findDistinctByRoles_Id(Long rolId);
 
+    List<Usuario> findDistinctByRoles_IdAndActivo(Long rolId, boolean activo);
 }

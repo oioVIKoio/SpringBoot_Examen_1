@@ -70,10 +70,47 @@ public class UsuarioService {
 
         return actualizado;
     }
+    private void validarPassword(String password) {
+
+        if (password == null || password.length() < 8) {
+            throw new IllegalArgumentException(
+                    "La contraseña debe tener al menos 8 caracteres"
+            );
+        }
+
+        boolean tieneMayuscula = false;
+        boolean tieneMinuscula = false;
+        boolean tieneNumero = false;
+
+        for (char caracter : password.toCharArray()) {
+
+            if (Character.isUpperCase(caracter)) {
+                tieneMayuscula = true;
+            }
+
+            if (Character.isLowerCase(caracter)) {
+                tieneMinuscula = true;
+            }
+
+            if (Character.isDigit(caracter)) {
+                tieneNumero = true;
+            }
+        }
+
+        if (!tieneMayuscula || !tieneMinuscula || !tieneNumero) {
+            throw new IllegalArgumentException(
+                    "La contraseña debe incluir mayúscula, minúscula y número"
+            );
+        }
+    }
     public Usuario registrarUsuario(Usuario usuario) {
+
+        validarPassword(usuario.getPassword());
+
         usuario.setPassword(
                 passwordEncoder.encode(usuario.getPassword())
         );
+
         usuario.setActivo(true);
 
         Usuario registrado =
@@ -92,16 +129,51 @@ public class UsuarioService {
     public List<Usuario> listarUsuarios() {
         return usuarioRepository.findAll();
     }
-    public List<Usuario> buscarUsuarios(String termino) {
-        if (termino == null || termino.isBlank()) {
-            return usuarioRepository.findAll();
+    public List<Usuario> buscarUsuarios(
+            String termino,
+            Long rolId,
+            Boolean activo) {
+
+        List<Usuario> usuarios;
+
+        if (rolId != null && activo != null) {
+
+            usuarios = usuarioRepository
+                    .findDistinctByRoles_IdAndActivo(
+                            rolId,
+                            activo
+                    );
+
+        } else if (rolId != null) {
+
+            usuarios = usuarioRepository
+                    .findDistinctByRoles_Id(rolId);
+
+        } else if (activo != null) {
+
+            usuarios = usuarioRepository
+                    .findByActivo(activo);
+
+        } else {
+
+            usuarios = usuarioRepository.findAll();
         }
 
-        String texto = termino.trim();
+        if (termino == null || termino.isBlank()) {
+            return usuarios;
+        }
 
-        return usuarioRepository
-                .findByNombresContainingIgnoreCaseOrApellidosContainingIgnoreCaseOrDniContainingOrCorreoContainingIgnoreCaseOrUsuarioContainingIgnoreCase(
-                        texto, texto, texto, texto, texto);
+        String texto = termino.trim().toLowerCase();
+
+        return usuarios.stream()
+                .filter(usuario ->
+                        usuario.getNombres().toLowerCase().contains(texto)
+                                || usuario.getApellidos().toLowerCase().contains(texto)
+                                || usuario.getDni().contains(texto)
+                                || usuario.getCorreo().toLowerCase().contains(texto)
+                                || usuario.getUsuario().toLowerCase().contains(texto)
+                )
+                .toList();
     }
 
     public Usuario buscarPorId(Long id) {
@@ -130,6 +202,8 @@ public class UsuarioService {
 
         if (datosNuevos.getPassword() != null
                 && !datosNuevos.getPassword().isBlank()) {
+
+            validarPassword(datosNuevos.getPassword());
 
             usuario.setPassword(
                     passwordEncoder.encode(
@@ -205,7 +279,13 @@ public class UsuarioService {
             TokenRecuperacion tokenEntity = tokenOpt.get();
             Usuario usuario = tokenEntity.getUsuario();
 
+            validarPassword(nuevaPassword);
+
             usuario.setPassword(passwordEncoder.encode(nuevaPassword));
+
+            usuario.setIntentosFallidos(0);
+            usuario.setBloqueadoHasta(null);
+
             usuarioRepository.save(usuario);
 
             tokenRepository.delete(tokenEntity);
@@ -213,4 +293,5 @@ public class UsuarioService {
         }
         return false;
     }
+
 }
