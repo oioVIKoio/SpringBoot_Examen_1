@@ -6,6 +6,8 @@ import pe.edu.tecsup.examen1.service.UsuarioService;
 
 import java.util.List;
 import java.util.Set;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
 
 @RestController
 @RequestMapping("/api/usuarios")
@@ -21,7 +23,10 @@ public class UsuarioController {
     public Usuario registrarUsuario(@RequestBody Usuario usuario) {
         return usuarioService.registrarUsuario(usuario);
     }
-
+    @GetMapping("/{id}")
+    public Usuario obtenerUsuario(@PathVariable Long id) {
+        return usuarioService.buscarPorId(id);
+    }
     @GetMapping
     public List<Usuario> listarUsuarios() {
         return usuarioService.listarUsuarios();
@@ -48,5 +53,10 @@ public class UsuarioController {
             @RequestBody Set<Long> rolesIds) {
 
         return usuarioService.asignarRoles(id, rolesIds);
+    }
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void eliminarUsuario(@PathVariable Long id) {
+        usuarioService.cambiarEstado(id, false);
     }
 }

@@ -125,34 +125,22 @@ public class SecurityConfig {
                         .hasAuthority("PERMISOS_VER")
 
 
-                        .requestMatchers(
-                                HttpMethod.PUT,
-                                "/api/usuarios/*/roles"
-                        )
+                        .requestMatchers(HttpMethod.PUT, "/api/usuarios/*/roles")
                         .hasAuthority("USUARIOS_ROLES")
 
-                        .requestMatchers(
-                                HttpMethod.PATCH,
-                                "/api/usuarios/*/estado"
-                        )
+                        .requestMatchers(HttpMethod.PATCH, "/api/usuarios/*/estado")
                         .hasAuthority("USUARIOS_ESTADO")
 
-                        .requestMatchers(
-                                HttpMethod.POST,
-                                "/api/usuarios"
-                        )
+                        .requestMatchers(HttpMethod.DELETE, "/api/usuarios/*")
+                        .hasAuthority("USUARIOS_ESTADO")
+
+                        .requestMatchers(HttpMethod.POST, "/api/usuarios")
                         .hasAuthority("USUARIOS_CREAR")
 
-                        .requestMatchers(
-                                HttpMethod.PUT,
-                                "/api/usuarios/*"
-                        )
+                        .requestMatchers(HttpMethod.PUT, "/api/usuarios/*")
                         .hasAuthority("USUARIOS_EDITAR")
 
-                        .requestMatchers(
-                                HttpMethod.GET,
-                                "/api/usuarios/**"
-                        )
+                        .requestMatchers(HttpMethod.GET, "/api/usuarios/**")
                         .hasAuthority("USUARIOS_VER")
 
 

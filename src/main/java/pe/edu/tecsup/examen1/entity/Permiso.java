@@ -1,7 +1,7 @@
 package pe.edu.tecsup.examen1.entity;
 
 import jakarta.persistence.*;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -18,6 +18,7 @@ public class Permiso {
 
     private String descripcion;
 
+    @JsonIgnore
     @ManyToMany(mappedBy = "permisos")
     private Set<Rol> roles = new HashSet<>();
 

@@ -3,9 +3,12 @@ package pe.edu.tecsup.examen1.entity;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 @Entity
 @Table(name = "usuarios")
 public class Usuario {
@@ -31,6 +34,7 @@ public class Usuario {
     @Column(nullable = false, unique = true)
     private String usuario;
 
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(nullable = false)
     private String password;
 
@@ -43,6 +47,10 @@ public class Usuario {
     private LocalDateTime fechaRegistro;
 
     private LocalDateTime ultimoAcceso;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "usuario")
+    private List<Auditoria> auditorias = new ArrayList<>();
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
@@ -183,5 +191,11 @@ public class Usuario {
     public void setBloqueadoHasta(LocalDateTime bloqueadoHasta) {
         this.bloqueadoHasta = bloqueadoHasta;
     }
+    public List<Auditoria> getAuditorias() {
+        return auditorias;
+    }
 
+    public void setAuditorias(List<Auditoria> auditorias) {
+        this.auditorias = auditorias;
+    }
 }

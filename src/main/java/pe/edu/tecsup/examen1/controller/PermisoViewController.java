@@ -4,21 +4,21 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import pe.edu.tecsup.examen1.entity.Permiso;
-import pe.edu.tecsup.examen1.repository.PermisoRepository;
 import pe.edu.tecsup.examen1.service.AuditoriaService;
+import pe.edu.tecsup.examen1.service.PermisoService;
 
 @Controller
 @RequestMapping("/permisos")
 public class PermisoViewController {
 
-    private final PermisoRepository permisoRepository;
+    private final PermisoService permisoService;
     private final AuditoriaService auditoriaService;
 
     public PermisoViewController(
-            PermisoRepository permisoRepository,
+            PermisoService permisoService,
             AuditoriaService auditoriaService) {
 
-        this.permisoRepository = permisoRepository;
+        this.permisoService = permisoService;
         this.auditoriaService = auditoriaService;
     }
 
@@ -27,7 +27,7 @@ public class PermisoViewController {
 
         model.addAttribute(
                 "permisos",
-                permisoRepository.findAll()
+                permisoService.listar()
         );
 
         return "permisos/lista";
@@ -50,12 +50,7 @@ public class PermisoViewController {
             Model model) {
 
         Permiso permiso =
-                permisoRepository.findById(id)
-                        .orElseThrow(() ->
-                                new RuntimeException(
-                                        "Permiso no encontrado"
-                                )
-                        );
+                permisoService.buscarPorId(id);
 
         model.addAttribute(
                 "permisoForm",
@@ -72,7 +67,7 @@ public class PermisoViewController {
         boolean nuevo = permiso.getId() == null;
 
         Permiso guardado =
-                permisoRepository.save(permiso);
+                permisoService.guardar(permiso);
 
         auditoriaService.registrar(
                 nuevo
