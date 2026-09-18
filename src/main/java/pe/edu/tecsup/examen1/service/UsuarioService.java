@@ -259,12 +259,18 @@ public class UsuarioService {
 
     public String crearTokenRecuperacion(Usuario usuario) {
         String token = UUID.randomUUID().toString();
-        TokenRecuperacion tokenEntity = new TokenRecuperacion(
-                token,
-                usuario,
+
+        TokenRecuperacion tokenEntity = tokenRepository.findByUsuario(usuario)
+                .orElse(new TokenRecuperacion());
+
+        tokenEntity.setToken(token);
+        tokenEntity.setUsuario(usuario);
+        tokenEntity.setFechaExpiracion(
                 LocalDateTime.now(clock).plusMinutes(15)
         );
+
         tokenRepository.save(tokenEntity);
+
         return token;
     }
 

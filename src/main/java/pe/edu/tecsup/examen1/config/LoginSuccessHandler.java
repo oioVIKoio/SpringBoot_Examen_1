@@ -55,7 +55,6 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
         boolean puedeVerRoles = authorities.stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLES_VER"));
-
         boolean puedeVerPermisos = authorities.stream()
                 .anyMatch(a -> a.getAuthority().equals("PERMISOS_VER"));
 
