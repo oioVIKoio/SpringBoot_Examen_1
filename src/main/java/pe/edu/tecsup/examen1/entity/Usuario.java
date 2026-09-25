@@ -48,9 +48,14 @@ public class Usuario {
 
     private LocalDateTime ultimoAcceso;
 
+
+
     @JsonIgnore
     @OneToMany(mappedBy = "usuario")
     private List<Auditoria> auditorias = new ArrayList<>();
+
+
+
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(

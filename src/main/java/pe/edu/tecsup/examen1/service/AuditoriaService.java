@@ -21,7 +21,9 @@ public class AuditoriaService {
 
 
     public AuditoriaService(
+
             AuditoriaRepository auditoriaRepository,
+
             UsuarioRepository usuarioRepository) {
 
         this.auditoriaRepository = auditoriaRepository;
