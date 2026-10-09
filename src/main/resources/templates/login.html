@@ -20,6 +20,10 @@
                         Usuario bloqueado temporalmente. Intente nuevamente en 5 minutos.
                     </div>
 
+                    <div th:if="${param.registrado}" class="alert alert-success" role="alert">
+                        Cuenta creada. Ya puede iniciar sesión; el administrador le asignará su rol.
+                    </div>
+
                     <div th:if="${param.cambioExitoso}" class="alert alert-success" role="alert">
                         ¡Contraseña actualizada exitosamente! Ya puede iniciar sesión.
                     </div>
@@ -40,6 +44,10 @@
 
                     <div class="text-center mt-3">
                         <a th:href="@{/recuperar-password}">¿Olvidó su contraseña?</a>
+                    </div>
+
+                    <div class="text-center mt-2">
+                        <a th:href="@{/registro}">¿No tiene cuenta? Regístrese</a>
                     </div>
                 </div>
             </div>

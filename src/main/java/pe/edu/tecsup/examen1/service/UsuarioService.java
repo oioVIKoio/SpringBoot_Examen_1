@@ -103,8 +103,30 @@ public class UsuarioService {
             );
         }
     }
+    private void validarDuplicados(Usuario usuario) {
+
+        if (usuarioRepository.existsByUsuario(usuario.getUsuario())) {
+            throw new IllegalArgumentException(
+                    "El nombre de usuario ya está registrado"
+            );
+        }
+
+        if (usuarioRepository.existsByCorreo(usuario.getCorreo())) {
+            throw new IllegalArgumentException(
+                    "El correo ya está registrado"
+            );
+        }
+
+        if (usuarioRepository.existsByDni(usuario.getDni())) {
+            throw new IllegalArgumentException(
+                    "El DNI ya está registrado"
+            );
+        }
+    }
+
     public Usuario registrarUsuario(Usuario usuario) {
 
+        validarDuplicados(usuario);
         validarPassword(usuario.getPassword());
 
         usuario.setPassword(

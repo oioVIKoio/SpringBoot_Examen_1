@@ -70,10 +70,6 @@ public class LoginFailureHandler implements AuthenticationFailureHandler {
             }
 
             usuarioRepository.save(usuario);
-
-            response.sendRedirect("/login?error");
-
-            usuarioRepository.save(usuario);
         }
 
         response.sendRedirect("/login?error");

@@ -58,6 +58,7 @@ El sistema cuenta con:
 - Autenticación y autorización con Spring Security.
 - Gestión de usuarios, roles y permisos.
 - Recuperación de contraseña.
+- Registro público de cuenta (`/registro`): la cuenta se crea sin rol y el administrador se lo asigna.
 - Bloqueo temporal por intentos fallidos.
 - Auditoría de operaciones.
 - Control de sesión por inactividad.
@@ -84,6 +85,8 @@ Durante el desarrollo se utilizaron diferentes entornos según cada integrante:
 La versión integrada del proyecto fue probada utilizando MariaDB.
 
 ## Ejecución
+
+Copiar `src/main/resources/application-local.properties.example` como `application-local.properties` y poner los datos de la BD local (ese archivo no se sube al repo).
 
 ```bash
 mvn clean test

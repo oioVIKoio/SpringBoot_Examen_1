@@ -46,6 +46,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/login",
+                                "/registro",
                                 "/recuperar-password",
                                 "/restablecer-password",
                                 "/css/**",
